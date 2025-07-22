@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Double Submit CSRF</title>
+</head>
+<body>
+  <h2>Exemplo CSRF - Double Submit Cookie</h2>
+  <button onclick="enviarRequisicao()">Enviar POST</button>
+
+  <script>
+    let csrfToken;
+
+    async function enviarRequisicao() {
+      if (!csrfToken) {
+        const res = await fetch('/csrf-token');
+        const data = await res.json();
+        csrfToken = data.csrfToken;
+      }
+
+      fetch('/process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-csrf-token': csrfToken
+        },
+        body: JSON.stringify({ exemplo: 'dados' })
+      })
+      .then(res => res.text())
+      .then(msg => alert(msg))
+      .catch(err => alert('Erro: ' + err));
+    }
+  </script>
+</body>
+</html>
